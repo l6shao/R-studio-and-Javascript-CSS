@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+        <script type="text/javascript" src="http://yourjavascript.com/211216325127/jstats.js">
+            </script>
+        
+    </head>
+    <body>
+        <div id="viz"></div>
+        <script type="text/javascript">
+            function Naive(){
+                var inputs=new Array();
+                    inputs.push(document.getElementById("X1").value);
+                    inputs.push(document.getElementById("X2").value);
+                    inputs.push(document.getElementById("X3").value);
+                    inputs.push(document.getElementById("X4").value);
+                    inputs.push(document.getElementById("X5").value);
+                
+                //alert(inputs);
+            d3.text("http://www.pic.ucla.edu/~lshao1/stocks.csv", function(datasetText) {
+                    
+                    var parsedCSV = d3.csv.parseRows(datasetText);
+                    
+                    for(i=0;i<parsedCSV.length;i++){
+                    if(parsedCSV[i][0]>2.5){
+                    parsedCSV[i][0]=0;
+                    }
+                    else{
+                    parsedCSV[i][0]=1;
+                    }
+                    }
+                    
+                    console.log(parsedCSV);
+                    
+                    var a=continuous(parsedCSV,inputs);
+                    
+                    d3.select("body").append("p").text(a);
+                    
+                    });
+                    
+            }
+        
+                    function continuous(matrix,arr03){
+                        
+                        
+                        var rows = matrix.length;//number of rows
+                        var cols = matrix[0].length;//number od cols
+                        var zeroy=0;
+                        var oney=0;
+                        
+                        //convert to numbers
+                        for(n=0;n<rows;n++){
+                            for(k=0;k<cols;k++){
+                                matrix[n][k]=Number(matrix[n][k]);
+                            }
+                        }
+                        alert(rows);
+                        alert(cols);
+                        for(n=0; n<rows;n++)//count zeros
+                        if(matrix[n][0]==0)
+                        zeroy=zeroy+1;
+                        
+                        for(n=0; n<rows;n++)//count ones
+                        if(matrix[n][0]==1)
+                        oney=oney+1;
+                        i=0;//row index
+                        j=1;//colunm index
+                        var arr01=new Array();
+                        
+                        //array stores means while y=0
+                        while(j<cols){
+                            var total=0.00;
+                            
+                            for(n=0; n<rows;n++){
+                            if(matrix[n][0]==0)
+                            total=total+matrix[n][j];
+                            //alert(total);
+                            }
+                            
+                            
+                            arr01.push(total/zeroy);
+                            
+                            j=j+1;
+                        }
+                        
+                        j=1;//colunm index
+                        var arr02=new Array();
+                        
+                        //array stores variances while y=0
+                        while(j<cols){
+                            var total=0.00;
+                            
+                            for(n=0; n<rows;n++)
+                            if(matrix[n][0]==0)
+                            total=total+(matrix[n][j]-arr01[j-1])*(matrix[n][j]-arr01[j-1]);
+                            
+                            arr02.push(total/zeroy);
+                            j=j+1;
+                        }
+                        
+                        j=1;
+                        
+                        
+                        
+                        
+                        var arr11=new Array();
+                        j=1;//colunm index
+                        
+                        //array stores means while y=1
+                        while(j<cols){
+                            var total=0.00;
+                            
+                            for(n=0; n<rows;n++)
+                            if(matrix[n][0]==1)
+                            total=total+matrix[n][j];
+                            
+                            
+                            arr11.push(total/oney);
+                            j=j+1;
+                        }
+                        
+                    
+                        j=1;//colunm index
+                        var arr12=new Array();
+                        
+                        //array stores variances while y=1
+                        while(j<cols){
+                            var total=0.00;
+                            
+                            for(n=0; n<rows;n++)
+                            if(matrix[n][0]==1)
+                            total=total+(matrix[n][j]-arr11[j-1])*(matrix[n][j]-arr11[j-1]);
+                            
+                            arr12.push(total/(oney-1));
+                            j=j+1;
+                        }
+                        
+                       // alert(arr02);
+                        
+                        
+                        
+                        
+                        //likelihood for zero
+                        var PX0=1;
+                        for(n=0; n<cols-1;n++)
+                        {
+                            //Note that a value greater than 1 is OK here – it is a probability density rather than a probability, because height is a continuous variable
+                            PX0=PX0*(1/Math.sqrt(2*Math.PI*arr02[n]))*Math.exp((-1*(arr03[n]-arr01[n])*(arr03[n]-arr01[n]))/(2*arr02[n]));
+                            
+                        }
+                       　// alert(PX0);
+                        
+                        //likelihood for one
+                        
+                        var PX1=1;
+                        for(n=0; n<cols-1;n++)
+                        {
+                            
+                            PX1=PX1*(1/Math.sqrt(2*Math.PI*arr12[n]))*Math.exp((-1*(arr03[n]-arr11[n])*(arr03[n]-arr11[n]))/(2*arr12[n]));
+                            
+                        }
+                        
+                       // alert(PX1);
+                        
+                        var compare0=(zeroy/rows)*PX0;
+                        var compare1=(oney/rows)*PX1;
+                        if(compare0>compare1){
+                            return ("y=0");
+                        }
+                        else if(compare1==compare0){
+                            return ("y=1 equal to y=0");
+                        }
+                        else
+                        {
+                            return ("y=1");
+                        }
+                        
+                    }
+        
+        
+            </script>
+        <fieldset>
+            <legend>Naive Bayes</legend>
+            
+            EPS.this.Y:<input type="text" id="X1"><br/></input>
+            ROI:<input type="text" id="X2"><br/></input>
+            Insider.Trans:<input type="text" id="X3"><br/></input>
+            Perf.YTD:<input type="text" id="X4"><br/></input>
+            Volatility.M:<input type="text" id="X5"><br/></input>
+            <input type="submit" value="classify" onclick="Naive()">
+                
+                </fieldset>
+        
+    </body>
+</html>

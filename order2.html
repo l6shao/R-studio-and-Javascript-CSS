@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Shao's&#174; Bookstore Order</title>
+        <link rel="stylesheet" type="text/css" href="/Users/lucy/Desktop/hw2pic/mybusiness.css" />
+
+    </head>
+    <body>
+        <h1>Shao's&#174; Bookstore</h1>
+        <div id="sidebar">
+            <aside>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Membership</a></li>
+                        <li><a href="#">Our address</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </nav>
+                
+            </aside>
+        </div>
+        
+        <div>
+            
+            <ul class="drop_menu">
+                <li><a href='#'>Home</a>
+                    <ul>
+                        <li><a href='#'>About us</a></li>
+                    </ul>
+                </li>
+                
+                <li><a href='#'>Products</a>
+                    <ul>
+                        <li><a href='#'>Some rental prices</a></li>
+                        <li><a href='#'>order here</a></li>
+                    </ul>
+                </li>
+                
+                <li><a href='#'>More</a>
+                    <ul>
+                        <li><a href='#'>Our Adress</a></li>
+                        <li><a href='#'>References</a></li>
+                    </ul>
+                </li>
+                
+            </ul>
+        </div>
+        
+ <div id="content">
+     <h3>Welcome!</h3>
+    <form id="information" method="post" action="">
+        <fieldset>
+            <legend>Customer Information</legend>
+            <p>please provide your information</p>
+            <label for="name">Your name:</label>
+            <input type="text" name="Customer name" id="name" ></input>
+            <br/>
+            <label for="street">Street:</label>
+            <input type="text" name="street" id="street" ></input>
+            <br/>
+            <label for="state">State:</label>
+            <input type="text" name="state" id="state"></input>
+            <br/>
+            <label for="city">City:</label>
+            <input type="text" name="city" id="city"></input>
+            <br/>
+            <label for="zip">Zipcode:</label>
+            <input type="text" name="zipcode" id="zip" ></input>
+            <br/>
+            <label for="email">email:</label>
+            <input type="text" name="email" id="email" ></input>
+            <br/>
+        </fieldset>
+        
+        
+        <fieldset>
+            <legend>Product Information</legend>
+            Book title<input type="text" name="title"></input><br/>
+            Author: <input type="text" name="anthor"></input><br/>
+            Condition: 
+			<input type="radio" name="condition" value="new" id="new" checked="checked"/>
+            <label for="new"> new</label>
+            <input type="radio"
+            name="condition" value="used" id="used"/>
+            <label for="used"> used</label>
+            <br/>
+            Do you want to
+            <input type="radio"
+            name="action" value="borrow" id="borrow" checked="checked"/>
+            <label for="borrow"> borrow</label>
+            or
+            <input type="radio" name="action" value="buy" id="buy" />
+            <label for="buy"> buy</label>
+            
+            
+            <br/>
+            Other services:
+            <input type="checkbox"
+            name="service" value="7 day free return" id="return" checked="checked"/>
+            <label for="return">7 day free return </label>
+            <input type="checkbox"
+            name="service" value="1 year book lost insurance" id="insurance" />
+            <label for="insurance"> 1 year book lost insurance</label>
+            <input type="checkbox"
+            name="service" value="pick up rental return service" id="pickUp" />
+            <label for="pickUp"> pick up service when return</label>
+            <br/>
+            payment method:
+            <select name="payment">
+                    <option value="visa">visa</option>
+                    <option value="master">master</option>
+            </select>
+            card number: <input type="password" name="card number" />
+        </fieldset>
+        
+        <fieldset>
+            <input type="submit" value="send"/>
+                <input type="reset"/>
+        </fieldset>
+
+    </form>
+    </div>
+    <p><a href="http://validator.w3.org/check?uri=referer">
+	<img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" /></a></p>
+	
+           </body>
+    
+</html>

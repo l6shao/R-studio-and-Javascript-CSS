@@ -1,0 +1,80 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Shao's&#174; Bookstore</title>
+        
+    </head>
+    <body>
+        
+    <form id="information" method="get" action="">
+        <fieldset>
+            <legend>Customer Information</legend>
+            <!-- buyer information-->
+            <p>please provide your information</p>
+            Your Name:<input type="text" name="Customer name"  ><br/></input>
+            Street:<input type="text" name="street" ><br/></input>
+            State:<input type="text" name="state" ><br/></input>
+            City:<input type="text" name="city" ><br/></input>
+            Zipcode:<input type="text" name="zipcode" ><br/></input>
+            email:<input type="text" name="email" ><br/></input>
+        </fieldse>
+        
+        
+        <fieldset>
+            <legend>Product Information</legend>
+            Book title<input type="text" name="title"><br/></input>
+            Author: <input type="text" name="anthor"><br/></input>
+            Condition: <input type="radio" name="condition" value="new" id="new" checked="checked"/>
+            <label for="new"> new</label>
+            <input type="radio"
+            name="action" value="used" id="used"/>
+            <label for="used"> used</label>
+            <br/>
+            Do you want to
+            <input type="radio"
+            name="action" value="borrow" id="borrow"checked="checked"/>
+            <label for="borrow"> borrow</label>
+            or
+            <input type="radio" name="service" value="buy" id="buy" />
+            <label for="buy"> buy</label>
+            
+            
+            <br/>
+            Other services:
+            <input type="checkbox"
+            name="service" value="7 day free return" id="return" checked="checked"/>
+            <label for="return">7 day free return </label>
+            <input type="checkbox"
+            name="service" value="1 year book lost insurance" id="insurance" />
+            <label for="insurance"> 1 year book lost insurance</label>
+            <input type="checkbox"
+            name="service" value="pick up rental return service" id="pickUp" />
+            <label for="pickUp"> pick up service when return</label>
+            <br/>
+            payment method:
+            <select name="payment">
+                    <option value="visa">visa</option>
+                    <option value="master">master</option>
+            </select>
+            
+            card number: <input type="password" name="card number" />
+
+
+        </fieldset>
+        
+        
+        <fieldset>
+            <input type="submit" value="send">
+                <input type="reset"/>
+                
+        </fieldset>
+
+    </form>
+    
+    <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" /></a>
+           </body>
+    
+</html>

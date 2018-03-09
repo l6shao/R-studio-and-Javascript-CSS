@@ -1,0 +1,260 @@
+---
+title: "stats20 final report"
+author: "Lucy Shao"
+date: "March 22, 2017"
+output: html_document
+---
+# Load the data.
+### Load/Read the data files directly into R as received. Do not use other software to change the file formats.
+ 
+
+```{r, echo=FALSE,include=FALSE}
+library(foreign)
+library(gdata)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+ ed<-read.dta("/Users/lucy/Downloads/edmunds.dta")
+ ir<-read.xls("/Users/lucy/Downloads/irs-la-zip.xls")
+ cellTowers<-read.csv("/Users/lucy/Desktop/la-cell-towers.csv",header = TRUE)
+```
+ 
+###What are the dimensions of the original data?
+```{r,echo=FALSE}
+dim(ed)
+dim(ir)
+dim(cellTowers)
+```
+###What are the observations of each dataset?
+1.The Edmunds data passses dealerships the information about leads that are submitted from Edmunds.com. The lead information, the Visitors submit leads, and dealerships have a unique ids.The data provides information about the cars the visitors submitted on Edmunds.com, including the unique ids of the lead, date submitted the lead, the make of the lead, the model of the lead, and so on.
+ 
+2.The IRS data provides detailed information from the tax returns of people from various areas. The informations such as the resident's zip code, wether the resident is married, the number of denpendents the resident have and so on.
+ 
+3.Cell Towers Data (cell.csv)
+The cell towers data provides information about individual cell towers in Los Angeles. The data contains information such as the longitude and latitude of the cell tower, the zip code of the cell tower, unique id of the cell tower and so on.
+
+
+
+```{r,echo=FALSE}
+
+```
+###Drop unneeded variables (See the data-descriptions file).
+```{r}
+ed<-ed[ ,c("lead_id","lead_date", "visitor_key", "make","model", "model_year","msrp","dealer_state","dealer_zip")]
+ir<-ir[ ,c("ZIPCODE","N1","MARS1","MARS2","MARS4","NUMDEP","A00100")]
+cellTowers<-cellTowers[ ,c("OBJECTID","city","ZIP","longitude","latitude")]
+```
+###How many variables are kept of each dataset?
+```{r,echo=FALSE}
+ncol(ed)
+ncol(ir)
+ncol(cellTowers)
+```
+9,7,5
+
+#Clean the data.
+###– Edmunds Data:
+```{r}
+#1. Missing values: The missing values in this dataset are stored as "NA", "" or "INA". Please change them to NA. (Brainstorm: if those characters are not given, do you have any strategy?)
+ed<-replace(ed, ed=="",NA)
+ed<-replace(ed,ed=="NA",NA)
+ed<-replace(ed,ed=="INA",NA)
+#2. Fix the variable make. Convert it to a factor, made all levels uppercase, reconciled spelling errors.
+ed$make<-as.factor(toupper(ed$make))
+ed$make<-replace(ed$make,ed$make=="ASTON MARTIN","ASTON-MARTIN")
+ed$make<-replace(ed$make,ed$make=="LAND ROVER","LAND-ROVER")
+#3. Fix the class of some variables. The variables model_year, msrp and dealer_zip should be numeric.
+ed$model_year<-as.numeric(ed$model_year)
+ed$msrp<-as.numeric(ed$msrp)
+ed$dealer_zip<-as.numeric(ed$dealer_zip)
+#4. Create two new variables: lead_year - four-digit year (e.g. 2012) and lead_month - four-digit year followed by - and two-digit month (e.g. 2015-02) for each lead.
+ed$lead_year<-format(as.Date(ed$lead_date), "%Y")
+ed$lead_month<-format(as.Date(ed$lead_date), "%Y-%m")
+```
+###– Irs Data:
+```{r}
+ir$AGIperReturn<-ir$A00100/ir$N1
+```
+#Data Summarization.
+###– Edmunds Data:
+####1. Generate a line graph for lead_month you created. Describe to trend. When did this website get a large increase in the number of leads per month? 
+####Answer:Before 2014 the number of leads is small, and there is a sudden increase From 2013-12 to 2014-01, in the year of 2014, the number of leads remain high. this website get a large increase in the number of leads per month from 2013-12 to 2014-01.
+```{r ,echo=FALSE}
+a<-table(ed$lead_month)
+plot(a,type="l",xlab = "lead_month",ylab = "number of leads",main="Line graph for lead_month")
+```
+
+###2. Generate a barplot for the top 20 dealer_state. You can to the table function to create a contingency table for dealer_state, sort by decreasing order, extra the first 20 elements and then draw a barplot. Which state has the most leads?
+###Answer: CA has the most leads
+```{r ,echo=FALSE}
+a<-table(ed$dealer_state)
+a<-sort(a, decreasing=TRUE)
+a<-head(a,n=20)
+barplot(a,xlab = "States",ylab = "number of dealers",main="barplot for the top 20 dealer_state")
+
+```
+###3. Extract a subset where lead_year equals 2014 and dealer_state equals "CA" for the subse- quent analysis.
+```{r}
+subed<-subset(ed,lead_year=="2014")
+subed<-subset(subed,subed$dealer_state=="CA")
+```
+###4. Generate a barplot for the top 20 make. Which make(s) is the most popular one(s)?
+
+####Answer: HONDA
+```{r,echo=FALSE}
+a<-table(ed$make)
+b<-sort(a,decreasing = TRUE)
+barplot(head(b,n=20),xlab = "make",ylab = "number",main="barplot for the top 20 make")
+```
+###5. Generate a boxplot for msrp for following groups: i. the leads of the top 1 make, ii. the leads of the top 2 make and iii. the leads of the other makes. Is the popularity of makes related to the price?
+
+####Answer:The retail price for the top 1 make, HONDA, is lower than the other two group's retail price, and the retail price for the top 2 make is lower than other makes' retail prices. There is a great possibility that the popularity of makes is related to the retail price, lower the price, higher the pupularity.
+```{r,echo=FALSE}
+a<-ed[ed$make!="TOYOTA",]
+b<-list(ed[ed$make=="HONDA",]$msrp,a$msrp,a[a$make!="HONDA",]$msrp)
+boxplot(b,xlab="makes",main=" msrp for three groups:top1 make, top2 make, others")
+```
+ 
+###6. Create a aggregated table with three variables: i. dealer_zip, ii. msrp.med - the median msrp for each dealer_zip and iii. lead.count - the number of leads found for each dealer_zip. We encourage stuents to use the functions group_by and summarise from the package dplyr for this part. Using the aggregate function might be tedious since we want to use multiple functions for the aggregations.
+```{r,echo=FALSE}
+aggEd<-ed %>% group_by(dealer_zip) %>% summarise( msrp.med=median(msrp,na.rm=TRUE), lead.count=n())
+aggEd
+```
+
+##– Irs Data:
+###1. Create a scatter plot matrix for all the 6 variables (except ZIPCODE). Describe and how the variables relate to each other. Is there any hypothesis you want to test? Just state your opinion.
+
+####Answer: The possible hypothesis I want to test is that is the mean difference between MARS1 and MARS2 significant
+
+```{r,echo=FALSE}
+par(mfrow=c(2,3))
+plot(ir$N1)
+plot(ir$MARS1)
+plot(ir$MARS2)
+plot(ir$MARS4)
+plot(ir$NUMDEP)
+plot(ir$A00100)
+```
+###– Cell Towers Data:
+
+
+
+###1. Generate a barplot for the top 20 ZIP. Which zip code with the most cell tower? 
+####Answer: 91042
+```{r,echo=FALSE}
+par(mfrow=c(1,1))
+a<-sort(table(cellTowers$ZIP), decreasing = TRUE)
+barplot(head(a, n=20),xlab = "ZIP CODE",ylab = "number of towers", main="a barplot for the top 20 ZIP")
+```
+ 
+###2. What cities are located in the zip code with the most cell tower? as shown in the output below
+```{r,echo=FALSE}
+a<-cellTowers[cellTowers$ZIP=="91042",]
+names(table(droplevels(a$city)))
+```
+###3. Create a aggregated table with three variables: i. ZIP, ii. cel.count - the number of cell towers in each ZIP. iii. lon.med - the median longitude for each ZIP. iv. lat.med - the median latitude for each ZIP. Again, we encourage students to use the functions group_by and summarise from the package dplyr for this part.
+```{r,echo=FALSE}
+aggT<-cellTowers %>% group_by(ZIP) %>% summarise(cel.count=n(),lon.med=median(longitude),lat.med=median(latitude))
+aggT
+```
+#• Merge/Join your datasets.
+###1. Append the information in the aggregated table from the Edmund data to the Irs dataset. That is,we want perform left join to that two table by the zip code and keep all the observations in Irs.
+```{r,echo=FALSE}
+ir<-merge(ir, aggEd, by.x = 'ZIPCODE', by.y = 'dealer_zip',all.x = TRUE)
+```
+###2. Again, append the information in the aggregated table from the Cell Towers data to the mergeddataset from the previous step.
+```{r,echo=FALSE}
+ir<-merge(ir, aggT, by.x = 'ZIPCODE', by.y = 'ZIP',all.x = TRUE)
+```
+###3. How many variables are there in the merged dataset? 
+###Answer:13
+```{r,echo=FALSE}
+ncol(ir)
+```
+
+# t-test:
+###1. Back to the boxplot you generated for msrp by three groups of make, perform the two-sided two-sample t-test for each pair of groups (3 times in total) to test the null hypothesis, H0 : the mean values for the two group are the same.
+```{r,echo=FALSE}
+Top2<-ed[ed$make=="TOYOTA",]$msrp
+Top1<-ed[ed$make=="HONDA",]$msrp
+c<-ed[ed$make!="TOYOTA",]
+Others<-c[c$make!="HONDA",]$msrp
+t.test(Top2, Top1, alternative = 'two.sided', pair =FALSE)
+t.test(Top1, Others, alternative = 'two.sided', pair =FALSE)
+t.test(Others, Top2, alternative = 'two.sided', pair =FALSE)
+```
+# Linear regression.
+##1. Is there any pair of variables from two different datasets has a significant linear relationship? 
+
+###answer: From the plot matrix and correlation matrixes there are potential linear relationships between lat.med and ZIPCODE,lon.med and ZIPCODE,  lon.med and A00100,
+##iii. is any other variable correlated with the location? 
+ 
+###answer:lat.med has a correlation with ZIPCODE 0.677 which is considerable high
+ 
+```{r ,echo=FALSE}
+plot(ir)
+cor(ir)
+cor(ir[complete.cases(ir$cel.count), ])
+cor(ir[complete.cases(ir$msrp.med), ])
+```
+###2. Fit a linear model to the pair of variables you picked in the previous step. Assign one of them to be the outcome variable (y) and the other to be the preditor (x) using your knowledge. Display the summary output of the linear model and the diagnostic plots.
+```{r}
+m1<-lm(ir$lat.med~ir$ZIPCODE)
+summary(m1)
+```
+
+#Custom functions.
+```{r,echo=FALSE}
+f<-function(x){
+  c1<-vector(length=0)
+   c2<-vector(length=0)
+    c3<-vector(length=0)
+     c4<-vector(length=0)
+     for(i in 1:length(x)){
+       if(is.na(x[i])){
+          c2<-c(c2,NA)
+          c3<-c(c3,NA)
+           c4<-c(c4,NA)
+       }
+      else if(nrow(ir[ir$ZIPCODE==x[i],])>0){
+         c1<-c(c1,x[i])
+         c2<-c(c2,ir[ir$ZIPCODE==x[i],]$cel.count)
+         c3<-c(c3,ir[ir$ZIPCODE==x[i],]$N1)
+         c4<-c(c4,ir[ir$ZIPCODE==x[i],]$lead.count)
+       }
+       else{
+         c2<-c(c2,0)
+          c3<-c(c3,0)
+           c4<-c(c4,0)
+       }
+     }
+     z<-cbind("Number of cell Tower"=c2,"Number of Returns"=c3,"Number of Leads"=c4)
+     rownames(z)<-x
+     knitr::kable(z)
+}
+f( c('90001', '19428','00033'))
+f(c('90001', '19428','00033','1004'))
+f(c('90001', '19428','00033',NA))
+```
+
+#Results and Conclusions.
+### Describe the results of the t-test. Interpret the output and explain what the result means in the context of the question that motivated using the t-test.
+
+####Answer:The p value for are three t-test performed are all significantly small thus we reject the null hypothesis that the mean values for the two group are the same. And we conclude that the mean values for the three groups are not the same.
+
+###Interpret the results of your linear model. Specifically, interpret what the slope coefficient means and how strongly correlated the variables are. Give some suggestions to improve your model (for example, do some transformation or exclude potential outliers).
+
+####Answer: The slope for my linear model is 1.513e-04, which is a small number, which may indicates that the two variable are not very strongly correlated. The R square is kind of small. To enlarge the slope for more obvious observations, one should transform the data using box-cox method. also,the linear assumptions are overall satisfied ans should be improved after transformation.
+```{r,echo=FALSE}
+par(mfrow=c(2,2))
+plot(m1)
+```
+
+###Demonstrate that the function you created in the analysis portion works.
+####Answer: as the code output shown, my function output is correct.
+```{r}
+f( c('90015', '90002','90013'))
+ir[ir$ZIPCODE=='90015',]
+ir[ir$ZIPCODE=='90002',]
+ir[ir$ZIPCODE=='90013',]
+```

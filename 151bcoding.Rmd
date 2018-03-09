@@ -1,0 +1,128 @@
+---
+title: "151bhw5 coding"
+author: "Lucy Shao"
+date: "June 7, 2017"
+output: pdf_document
+---
+```{r}
+#mu eigenvalue, x eigenvector
+power1<-function(n,A,x,TOL,N){
+  k<-1
+  xp<-norm(x,type="I")
+  x<-x/xp
+  while(k<=N){
+    y<-A%*%x
+   
+    yp<-norm(y,type="I")
+     mu<-yp
+    if(yp==0){
+      return (list(0,x,k))
+    }
+    err<-norm(x-(y/yp),type="I")
+    x<-y/yp
+    if(err<TOL){
+      return (list(mu,x,k))
+      
+    }
+    k<-k+1
+  }
+  
+}
+
+
+ power2<-function(n,A,x,TOL,N){
+  k<-1
+  xp<-norm(x,type="2")
+  x<-x/xp
+  while(k<=N){
+    y<-A%*%x
+   
+    yp<-norm(y,type="2")
+     mu<-yp
+    if(yp==0){
+      return (list(0,x))
+    }
+    err<-norm(x-(y/yp),type="2")
+    x<-y/yp
+    if(err<TOL){
+      return (list(mu,x,k))
+      
+    }
+    k<-k+1
+  }
+  
+ }
+ #check wether invertible
+ f <- function(m) class(try(solve(m),silent=T))=="matrix"
+ 
+ invpower<-function(n,A,x,TOL,N){
+   q<-as.numeric((t(x)%*%A%*%x)/(t(x)%*%x))
+   k<-1
+   xp<-norm(x,type="I")
+   x<-(x/xp)
+   while(k<=N){
+     if(f(A-q*diag(n))==FALSE){
+       return(q)
+     }
+     y<-solve(A-q*diag(n))%*%x
+     yp<-norm(y,type="I")
+     mu<-yp
+     err<-norm((x-(y/yp)), type="I")
+     x<-(y/yp)
+     if(err<TOL){
+       mu<-(1/mu)+q
+       return(list(mu,x,k))
+     }
+     k=k+1
+   }
+   return("unsuccessful")
+ }
+ 
+```
+```{r}
+p=0.85
+#first
+one<-c(0.01,0.01,0.86,rep(0.01,12))
+#2
+two<-c(0.435,rep(0.01,9),0.435,rep(0.01,4))
+three<-c(0.01,0.435,0.01,0.01,0.435,rep(0.01,10))
+four<-c(17/60,17/60,rep(0.01,10),17/60,0.01,0.01)
+five<-c(rep(0.01,5),0.435,0.01,0.435,rep(0.01,7))
+six<-c(rep(0.01,6),17/60,17/60,0.01,17/60,rep(0.01,5))
+
+#7th
+seven<-c(rep(0.01,9),0.86,rep(0.01,5))
+eight<-c(rep(0.01,8),0.435,0.435,rep(0.01,5))
+nine<-c(rep(0.01,4),0.435,rep(0.01,5),0.435, rep(0.01,4))
+ten<-c(rep(0.01,8),17/60,0.01,17/60,0.01,0.01,17/60,0.01)
+eleven<-c(rep(0.01,11),0.435,0.01,0.435,0.01)
+#12th
+twelve<-c(rep(0.01,12),0.86,rep(0.01,2))
+thirteen<-c(rep(0.01,10),0.435,0.01,0.01,0.01,0.435)
+#14th
+fourteen<-c(rep(0.01,12),0.86,rep(0.01,2))
+#15th
+fifteen<-c(rep(0.01,13),0.86,0.01)
+C<-rbind(one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen)
+
+#from the smallest to the largest eigenvalue
+order(Re(eigen(C)$values))
+
+
+#Use three methods ps. the first returned value is the dominant eigenvalue
+power1(15,C,matrix(c(rep(1,15))),0.00001,100)
+power2(15,C,matrix(c(rep(1,15))),0.00001,100)
+invpower(15,C,matrix(c(rep(1,15))),0.00001,100)
+#Exact,the largest is 0.9975
+eigen(C)$values
+
+#random initial
+set.seed(123)
+power1(15,C,matrix(rnorm(15)),0.00001,100)
+power2(15,C,matrix(rnorm(15)),0.00001,100)
+invpower(15,C,matrix(rnorm(15)),0.00001,100)
+```
+
+###A PDF report
+I have explored that the approximate eigenvalues are all very close to the exact one. The rank is shown by computation that the smallest eigenvalue to the largest eigenvalue: 2  3 10 11  5  6  8  9 15 13 14 12  7  4  1 which is significant if we need more information about the webpages. The tolerance was set to be 10^-5. If the initial value is set to be a vector of 1's, the iterations it take for power1 is 18, for power2 is 16, for invpower is 3. This result has shown that for this approximation, the inverse power method takes less iterations and reaches better efficiency. If the initial value is set to be random, the inversepow method's iteration exceeds 100. 
+

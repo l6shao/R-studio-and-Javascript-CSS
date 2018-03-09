@@ -1,0 +1,168 @@
+---
+title: "hw8"
+author: "Lucy Shao"
+date: "December 4, 2016"
+output: pdf_document
+---
+###Q1
+Please download credit data from ccle week 10.
+```{r}
+data=read.csv("/Users/lucy/Downloads/Credit.csv",header=T)
+data$Balance=data$Balance+1e-3
+head(data)
+attach(data)
+```
+• This data has 400 observations and 11 variables.
+• Use Balance as your response variable.
+• Split your data into 70% tranning and 30% testing using set.seed(123456)
+```{r}
+dim(data)
+set.seed(123456)
+sam=sample(400,400*0.7)
+train=data[sam,]
+test=subset(data, !(num %in% train$num))
+dim(train)
+dim(test)
+```
+• Create a full model with all the 10 predictors.
+• create a summary for your model and the anova for the full model
+
+```{r}
+m1<-lm(Balance~Income+Limit+Rating+Cards+Age+Education+Gender+Student+Married+Ethnicity,data=train)
+summary(m1)
+anova(m1)
+par(mfrow=c(2,2))
+plot(m1)
+library(car)
+vif(m1)
+```
+• Which predictors are significant? Report your R-Square. 
+####Income,Age,limit,rating,cards,student; R^2=0.9531;
+ 
+• Check diagnostics for your full model. Comment on violations if any. (don't forget the vif) 
+####The four assumptions,Independence, normality, random and constant variances are all violated, this is not a good model; Also, from the VIF, there are two variables greater than five indicates the severity of multicollinearity.
+ 
+• Use inverse response plot to find the best transformation of the response variable.
+• create mmps for your response variable and all your predictors.
+• Use powerTransform to find the best transformation(s) to be done on your variables.
+```{r}
+library(car)
+inverseResponsePlot(m1)
+par(mfrow=c(3,4))
+m10<-lm(Balance~Income,data=train)
+mmp(m10,train$Income)
+m11<-lm(Balance~Limit,data=train)
+mmp(m11,train$Limit)
+m12<-lm(Balance~Rating,data=train)
+mmp(m12,train$Rating)
+m13<-lm(Balance~Cards,data=train)
+mmp(m13,train$Cards)
+m14<-lm(Balance~Age,data=train)
+mmp(m14,train$Age)
+m15<-lm(Balance~Education,data=train)
+mmp(m15,train$Education)
+m16<-lm(Balance~Gender,data=train)
+mmp(m16,train$Gender)
+m17<-lm(Balance~Student,data=train)
+mmp(m17,train$Student)
+m18<-lm(Balance~Married,data=train)
+mmp(m18,train$Married)
+m19<-lm(Balance~Ethnicity,data=train)
+mmp(m19,train$Ethnicity)
+library(alr3)
+summary(powerTransform(cbind(Balance,Income,Limit,Rating,Cards,Age)~1,data=train))
+```
+
+
+• Conduct a new full model with the transformed variables. Check assumptions.
+```{r}
+trainTrans=train;
+trainTrans$Balance=trainTrans$Balance^0.34
+trainTrans$Income=trainTrans$Income^0.29
+trainTrans$Limit=trainTrans$Limit^0.67
+trainTrans$Rating=trainTrans$Rating^0.59
+trainTrans$Cards=trainTrans$Cards^0.35
+trainTrans$Age=trainTrans$Age^0.83
+m2=lm(data=trainTrans,Balance~Income+Limit+Rating+Cards+Age+Education+Gender+Student+Married+Ethnicity)
+summary(m2)
+anova(m2)
+par(mfrow=c(2,2))
+plot(m2)
+library(car)
+vif(m2)
+```
+####The four assumptions,Independence, normality, random and constant variances are all violated, this is not a good model; Also, from the VIF, there are two variables greater than five indicates the severity of multicollinearity.
+
+• Use the step function with the backword method and AIC criteria to find the best subset of your predictors. Report your model and its summary using the best preditors only. 
+
+```{r}
+library(MASS)
+step(m2,direction="backward",data=trainTrans)
+```
+```{r}
+m3=lm(Balance ~ Income + Limit + Rating + Student + Ethnicity, 
+     data = trainTrans)
+
+```
+• Check assumptions.
+
+```{r}
+m3<-lm(formula = Balance ~ Income + Limit + Rating + Student + Ethnicity, 
+     data = trainTrans)
+summary(m3)
+anova(m3)
+par(mfrow=c(2,2))
+plot(m3)
+library(car)
+vif(m3)
+```
+###The model is better than the original result that less points are bad leverage points, with better constant vairiance and random residuals, but the normality is still not satisfied, also the there are two variables's VIF greater than five indicates the severity of multicollinearity.
+
+• Now use your testing data to creat a SLR model between the (transformed predicted response) and the transformed response from the testing data.
+• Create a scatter plot for your SLR and report its R-Square.
+```{r}
+testTrans=test;
+testTrans$Balance=testTrans$Balance^0.34
+testTrans$Income=testTrans$Income^0.29
+testTrans$Limit=testTrans$Limit^0.67
+testTrans$Rating=testTrans$Rating^0.59
+testTrans$Cards=testTrans$Cards^0.35
+testTrans$Age=testTrans$Age^0.83
+testPred=predict(newdata=testTrans,object=m3)
+SLR=lm(testTrans$Balance~testPred)
+summary(SLR)
+```
+• Create a scatter plot for your SLR and report its R-Square.
+```{r}
+plot(testPred,testTrans$Balance)
+``` 
+ 
+####R^2=0.8927
+ 
+• Comment on your findings. 
+
+####The test predicted value is works only if it is larger than 5.
+###Q2
+###What are the major areas in which masculine idealists and masculine moderates are significantly different from each other? Explain the results within context and mention which group is higher and which group is lower? 
+ 
+The mean value of Hegemonic Mascuulinity Scale for Masculine Idealists is
+larger than for Masculine Moderates. Masculine Idealists have significantly larger percentage of Farm bacground than Masculine Moderates.Masculine Idealists have significantly lower Self-reported health than Masculine Moderates.Masculine Idealists have significantly lower percentage of college degree holders than Masculine Moder- ates.Masculine Idealists have significantly lower percentage of Physical exams, Prostate exams, Flu shots, and compliance with the three services than Masculine Moderates.
+
+#Part two
+
+a.The odds ratio 1.65 means, the odds of a man with college degree 
+compliant with all three services is 1.65 times bigger than the odds of a 
+man without college degree compliant with all three services.
+
+b.We are 95 precent confidenct that the true value of the odds of the 
+college degree with complient all three serives is between 1.20 and 2.27.
+
+c. The odds ratio 1.02 means that the odds of a man with high household 
+income with all three services is 1.02 times greater than the odds of 
+a man without high household income with all three services.
+
+
+
+
+
+

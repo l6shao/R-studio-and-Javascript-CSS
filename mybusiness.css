@@ -1,0 +1,169 @@
+
+h1, h2 {font-family: verdana;
+        color: DimGray;
+        font-weight: bold;
+         font-variant: small-caps;
+         text-decoration: overline;
+}
+
+h3, h4 {
+    font-family: Tahoma;
+    color: CadetBlue;
+    font-size: 25px;}
+
+
+table {border-width: 5px;
+    border-style: dotted; }
+
+caption {color: LightBlue;
+    font-family: courier;
+    font-size: 20px;
+}
+
+td {width: 150px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+img {
+    float: right;
+    margin: 0 0 10px 10px;
+}
+
+
+
+a:link {
+    font-style: italic;
+    font-family: "Times New Roman", Georgia, Serif;
+    font-weight: bold;
+    color: CadetBlue;
+    font-size:20px;
+
+}
+
+a:visited {
+   text-decoration: none;
+    color: #ffcc00;
+    font-size:20px;
+
+}
+
+a:hover {
+    text-decoration: none;
+    color: #e6b800;
+    font-size:20px;
+
+}
+
+a:active {
+    text-decoration: none;
+    font-weight:bold;
+    font-size:20px;
+}
+
+
+.drop_menu {
+    
+   
+    background:DimGray;
+   
+    padding:0;
+  
+    margin:0;
+
+    list-style-type:none;
+    height:30px;
+}
+
+.drop_menu li { float:left; }
+
+.drop_menu li a {
+    padding:9px 20px;
+    display:block;
+    color:#fff;
+    text-decoration:none;
+    font:12px arial, verdana, sans-serif;
+}
+
+
+.drop_menu ul {
+    position:absolute;
+    left:-10000px;
+    top:-10000px;
+    list-style-type:none;
+}
+.drop_menu li:hover { position:relative;
+    background:CadetBlue; }
+.drop_menu li:hover ul {
+    
+    left:0px;
+    top:30px;
+    background:CadetBlue;
+    padding:0px;
+    
+}
+
+
+
+.drop_menu li:hover ul li a {
+    padding:5px;
+    display:block;
+    width:168px;
+    text-indent:15px;
+    background-color:CadetBlue;
+    
+}
+
+.drop_menu li:hover ul li a:hover { background:DimGray;}
+
+#sidebar
+{
+    float: left;
+    width:200px;
+    padding-top:50px;
+    padding-right:15px;
+    padding-bottom:0px;
+    padding-left:15px;
+}
+
+nav li a
+{
+    font-size:120%;
+    color:#ffe066;
+    text-decoration:none;
+    display:block;
+    background-color:DimGray;
+    padding:8px;
+    border-bottom-width:1px;
+    border-bottom-style:solid;
+    border-bottom-color:#ffe066;
+}
+
+nav li a:hover,nav li active {
+    color:#ffe066;
+    background-color:DimGray;
+}
+
+nav ul
+{
+    list-style-type:none;
+    margin-bottom:20px;
+    padding-bottom:153px;
+    padding-top:0;
+    padding-right:0;
+    padding-left:0;
+    margin-top:0;
+    margin-right:0;
+    margin-left:0;
+    background-repeat:no-repeat;
+    background-position: bottom;
+}
+
+#content {
+    margin-left:230px;
+    padding-left:20px;
+    padding-right:0;
+    padding-bottom:0;
+    padding-top:0;
+}
+
